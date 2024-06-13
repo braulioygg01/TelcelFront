@@ -1,14 +1,16 @@
-const User = require('../models/User');
-const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const User = require('../models/User');
+const config = require('config');
 
 exports.register = async (req, res) => {
   const { firstName, lastName, phone, email, password, role } = req.body;
 
   try {
     let user = await User.findOne({ email });
+
     if (user) {
-      return res.status(400).json({ msg: 'User already exists' });
+      return res.status(400).json({ msg: 'El usuario ya existe' });
     }
 
     user = new User({
@@ -22,6 +24,7 @@ exports.register = async (req, res) => {
 
     const salt = await bcrypt.genSalt(10);
     user.password = await bcrypt.hash(password, salt);
+
     await user.save();
 
     const payload = {
@@ -32,7 +35,7 @@ exports.register = async (req, res) => {
 
     jwt.sign(
       payload,
-      'secret',
+      config.get('jwtSecret'),
       { expiresIn: 360000 },
       (err, token) => {
         if (err) throw err;
@@ -50,13 +53,15 @@ exports.login = async (req, res) => {
 
   try {
     let user = await User.findOne({ email });
+
     if (!user) {
-      return res.status(400).json({ msg: 'Invalid Credentials' });
+      return res.status(400).json({ msg: 'Usuario no encontrado' });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
+
     if (!isMatch) {
-      return res.status(400).json({ msg: 'Invalid Credentials' });
+      return res.status(400).json({ msg: 'Credenciales inválidas' });
     }
 
     const payload = {
@@ -67,7 +72,7 @@ exports.login = async (req, res) => {
 
     jwt.sign(
       payload,
-      'secret',
+      config.get('jwtSecret'),
       { expiresIn: 360000 },
       (err, token) => {
         if (err) throw err;
