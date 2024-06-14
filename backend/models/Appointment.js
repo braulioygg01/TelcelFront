@@ -1,11 +1,20 @@
+// models/Appointment.js
 const mongoose = require('mongoose');
-const AppointmentSchema = new mongoose.Schema({
-  motivoCita: String,
-  horaCita: String,
-//   estatusCita: String,
-//   dispositivos: [{ marca: String, modelo: String, problema: String }],
-//   fechaRegistro: { type: Date, default: Date.now },
-//   fechaEntrega: Date,
-//   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User'}
+
+// const deviceSchema = new mongoose.Schema({
+//   deviceName: { type: String, required: true },
+//   issueDescription: { type: String, required: true },
+// });
+
+const appointmentSchema = new mongoose.Schema({
+  clientId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  reason: { type: String, required: true },
+  appointmentTime: { type: String, required: true },
+  status: { type: String, required: true, enum: ['Pending', 'Confirmed', 'Completed', 'Cancelled'] },
+  //devices: [deviceSchema],
+  registrationDate: { type: Date, default: Date.now },
+  deliveryDate: { type: Date },
 });
-module.exports = mongoose.model('Appointment', AppointmentSchema);
+
+const Appointment = mongoose.model('Appointment', appointmentSchema);
+module.exports = Appointment;

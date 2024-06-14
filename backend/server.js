@@ -1,31 +1,29 @@
 const express = require('express');
-const mongoose = require('mongoose');
-const config = require('./config/config'); // Asegúrate de que el path es correcto
-
 const app = express();
+const dotenv = require('dotenv');
+const dbConnection = require('./db/db');
+const bodyParser = require('body-parser');
 
-// Conectar a MongoDB
-mongoose.connect(config.mongoURI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
-.then(() => console.log('MongoDB conectado'))
-.catch(err => console.log('Error al conectar a MongoDB:', err));
+const authRouter = require('./routes/auth');
+const appointmentRouter = require('./routes/appointments');
+const sparepartsRoutes = require('./routes/spareparts');
+const repairsRoutes = require('./routes/repairs');
 
-// Middlewares
 app.use(express.json());
 
-// Rutas
-const authRoutes = require('./routes/auth');
-const appointmentRoutes = require('./routes/appointments');
-const sparePartRoutes = require('./routes/spareparts');
-const repairRoutes = require('./routes/repairs');
+dotenv.config();
 
-app.use('/api/auth', authRoutes);
-app.use('/api/appointments', appointmentRoutes);
-app.use('/api/spareparts', sparePartRoutes);
-app.use('/api/repairs', repairRoutes);
+app.use(bodyParser.json());
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Servidor iniciado en el puerto ${PORT}`));
+const PORT = process.env.PORT
 
+app.use('/api/auth', authRouter);
+app.use('/api/appointments', appointmentRouter);
+app.use('/api/spareparts', sparepartsRoutes);
+app.use('/api/repairs', repairsRoutes);
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
+
+dbConnection();

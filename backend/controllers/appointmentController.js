@@ -1,23 +1,28 @@
 const Appointment = require('../models/Appointment');
 
-exports.createAppointment = async (req, res) => {
+// Agendar una cita nueva
+const createAppointment = async (req, res) => {
   try {
-    const { motivoCita, horaCita} = req.body;
+    if(!req.user){
+      return res.status(401).json({message: 'No autenticado'})
+    }
+    const { motivoCita, horaCita, estatusCita} = req.body;
     const newAppointment = new Appointment({
       motivoCita,
-      horaCita
-      // estatusCita,
+      horaCita,
+      estatusCita,
       // dispositivos,
-      // user: req.user.id
+      user: req.user.id
     });
-    const appointment = await newAppointment.save();
-    res.json(appointment);
+    newAppointment = await newAppointment.save();
+    res.json(newAppointment);
   } catch (err) {
     console.error(err.message);
     res.status(500).send('Server Error');
   }
 };
 
+// Ver citas agendadas
 exports.getAppointments = async (req, res) => {
   try {
     const appointments = await Appointment.find().populate('user', ['name']);
@@ -27,3 +32,5 @@ exports.getAppointments = async (req, res) => {
     res.status(500).send('Server Error');
   }
 };
+
+module.exports = {createAppointment};

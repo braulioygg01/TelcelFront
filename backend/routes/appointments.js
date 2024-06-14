@@ -1,12 +1,18 @@
 const express = require('express');
-const router = express.Router();
-const { createAppointment, getAppointments } = require('../controllers/appointmentController');
-const authMiddleware = require('../middlewares/authMiddleware');
+const appointmentRouter = express.Router();
+const { createAppointment } = require('../controllers/appointmentController');
 
-// Ruta para crear una nueva cita
-router.post('/', authMiddleware, createAppointment);
+// Crear nueva cita
+appointmentRouter.post("/", createAppointment);
 
-// Ruta para obtener todas las citas
-router.get('/appointments', authMiddleware, getAppointments);
+// Ver todas las citas
+// router.get('/', async (req, res) => {
+//   try {
+//     const appointments = await Appointment.find().populate('clientId', 'firstName lastName');
+//     res.json(appointments);
+//   } catch (error) {
+//     res.status(500).json({ error: error.message });
+//   }
+// });
 
-module.exports = router;
+module.exports = appointmentRouter;
