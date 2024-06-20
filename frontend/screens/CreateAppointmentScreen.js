@@ -1,60 +1,42 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { View, TextInput, Button, StyleSheet } from 'react-native';
 import api from '../services/api';
 
-const CreateAppointmentScreen = ({ navigation }) => {
+const CreateAppointmentScreen = () => {
   const [motivoCita, setMotivoCita] = useState('');
   const [horaCita, setHoraCita] = useState('');
-  //const [estatusCita, setEstatusCita] = useState('');
-  //const [devices, setDevices] = useState([]);
+  const [devices, setDevices] = useState([]);
 
   const handleCreateAppointment = async () => {
     try {
-      const token = await AsyncStorage.getItem('token');
-      if (!token) {
-        Alert.alert('Error', 'No se encontró el token de autenticación.');
-        return;
-      }
-
-      const res = await api.post('/appointments', 
-        { motivoCita, horaCita},
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const res = await api.post('/appointments', { motivoCita, horaCita });
       if (res.status === 201) {
-        Alert.alert('Éxito', 'Cita creada con éxito');
-        navigation.goBack();
+        console.log('Cita creada exitosamente:', res.data);
+        history.push('/appointments');
+        alert('¡La cita se ha creado exitosamente!');
       }
     } catch (err) {
       console.error(err);
-      if (err.response) {
-        console.log('Error data:', err.response.data);
-        console.log('Error status:', err.response.status);
-        console.log('Error headers:', err.response.headers);
-        Alert.alert('Error', `Error al crear la cita: ${err.response.data.message || 'Por favor, intenta de nuevo.'}`);
-      } else {
-        Alert.alert('Error', 'Error de red. Por favor, inténtalo de nuevo.');
-      }
+      alert('Error al crear la cita. Por favor, inténtalo de nuevo más tarde.');
     }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>Motivo de la Cita</Text>
-      <TextInput
+      <TextInput 
         style={styles.input}
-        value={motivoCita}
-        onChangeText={setMotivoCita}
+        placeholder="Motivo de la Cita" 
+        onChangeText={setMotivoCita} 
+        value={motivoCita} 
       />
-
-      <Text style={styles.label}>Hora de la Cita</Text>
-      <TextInput
+      <TextInput 
         style={styles.input}
-        value={horaCita}
-        onChangeText={setHoraCita}
+        placeholder="Hora de la Cita" 
+        onChangeText={setHoraCita} 
+        value={horaCita} 
       />
-      
-      <Button title="Crear Cita" onPress={handleCreateAppointment} />
+      {/* Implementar la lógica para agregar dispositivos*/}
+      <Button title="Crear Cita" onPress={handleCreateAppointment}/>
     </View>
   );
 };
@@ -62,19 +44,15 @@ const CreateAppointmentScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
-    backgroundColor: '#fff',
-  },
-  label: {
-    fontSize: 16,
-    marginBottom: 5,
+    justifyContent: 'center',
+    paddingHorizontal: 16,
   },
   input: {
     height: 40,
-    borderColor: '#ccc',
+    borderColor: 'gray',
     borderWidth: 1,
-    marginBottom: 15,
-    paddingHorizontal: 10,
+    marginBottom: 12,
+    paddingHorizontal: 8,
   },
 });
 

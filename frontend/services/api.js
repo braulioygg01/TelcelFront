@@ -1,8 +1,7 @@
-// services/api.js
 import axios from 'axios';
 
-const api = axios.create({
-  baseURL: 'http://localhost:5000/api', // Reemplaza con la URL de tu servidor backend
+const instance = axios.create({
+  baseURL: 'backend-proyecto-kxviycaj7.vercel.app'
 });
 
-export default api;
+export default instance;
